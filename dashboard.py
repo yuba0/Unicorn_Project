@@ -38,6 +38,9 @@ def load_data():
 
 df = load_data()
 
+# Base de l'API (configurable via variable d'environnement API_BASE)
+API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8000")
+
 # --- SECTION 1 : LE TOP 5 DES PÉPITES ---
 st.subheader("🚀 Top 5 des Licornes Potentielles (Non encore acquises)")
 
@@ -86,7 +89,7 @@ if submit:
             "investor_count": int(investor_count),
             "cluster_profile": int(cluster_profile),
         }
-        endpoint = "http://127.0.0.1:8000/predict"
+        endpoint = f"{API_BASE}/predict"
     else:
         payload = {
             "funding_total_usd": float(funding),
@@ -96,7 +99,7 @@ if submit:
             "funding_rounds_count": float(funding_rounds_count),
             "investor_count": float(investor_count),
         }
-        endpoint = "http://127.0.0.1:8000/cluster"
+        endpoint = f"{API_BASE}/cluster"
 
     try:
         response = requests.post(endpoint, json=payload, timeout=5)

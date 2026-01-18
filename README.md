@@ -52,6 +52,30 @@ streamlit run dashboard.py
   - **Cluster (non supervisé)** : funding, funding_rounds, funding_rounds_count, relations, investisseurs.
 - Le top 5 est calculé depuis `data/processed/processed_startups.csv`.
 
+## Docker (option déploiement)
+- Image API (depuis la racine) :
+```bash
+docker build -t unicorn-api -f api/Dockerfile .
+docker run -p 8000:8000 unicorn-api
+# test : http://127.0.0.1:8000/docs
+```
+- Image Dashboard :
+```bash
+docker build -t unicorn-dashboard -f dashboard.Dockerfile .
+docker run -p 8501:8501 unicorn-dashboard
+# ouvrir : http://127.0.0.1:8501
+```
+  - Si l’API et le dashboard tournent en conteneurs séparés, ils ne partagent pas 127.0.0.1. Deux options :
+    1) Réseau Docker commun :
+       ```
+       docker network create unicorn-net
+       docker run -d --name unicorn-api --network unicorn-net -p 8000:8000 unicorn-api
+       docker run -d --name unicorn-dashboard --network unicorn-net -p 8501:8501 -e API_BASE=http://unicorn-api:8000 unicorn-dashboard
+       ```
+    2) Dashboard en local (ou API sur host) : laisse `API_BASE` par défaut (127.0.0.1:8000).
+  - Variable d’env `API_BASE` (dans le conteneur dashboard ou en local) permet de pointer vers l’API : exemple `API_BASE=http://host.docker.internal:8000` sur macOS/Windows, ou `http://unicorn-api:8000` dans un réseau Docker.
+Notes : les bruts `data/raw/` ne sont pas copiés. Les modèles .pkl et la table processed sont copiés dans les images. scikit-learn est épinglé en 1.6.1 pour compatibilité pickle.
+
 ## Points clés
 - Vérifie la présence des artefacts : `models/unicorn_model.pkl` et `models/unicorn_clusters.pkl`.
 - scikit-learn doit être en 1.6.1 (épinglé dans `requirements.txt`) pour charger les pickles.
