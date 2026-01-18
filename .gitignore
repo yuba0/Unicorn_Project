@@ -1,0 +1,16 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Envs
+.env
+.venv/
+.env.local
+
+# OS / editor
+.DS_Store
+.ipynb_checkpoints/
+
+# Data heavy
+/data/raw/
